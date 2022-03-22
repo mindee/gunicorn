@@ -5,6 +5,7 @@
 
 import io
 import sys
+import os
 
 from gunicorn.http.errors import (NoMoreData, ChunkMissingTerminator,
                                   InvalidChunkSize)
@@ -211,8 +212,9 @@ class Body(object):
             self.buf.write(rest)
             return ret
 
+        buf_read_size = int(os.environ.get("GUNICORN_BUFFER_SIZE", 1024))
         while size > self.buf.tell():
-            data = self.reader.read(1024)
+            data = self.reader.read(buf_read_size)
             if not data:
                 break
             self.buf.write(data)
